@@ -1,0 +1,4 @@
+#TODO generate requirements.txt
+.venv
+# bdd 100k test subset (10k images)
+test 
