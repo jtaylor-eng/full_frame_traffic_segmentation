@@ -3,8 +3,9 @@ PROJECT UTILITIES
 
 Functionality to:
  - get sample images from a directory
- - distance function
- - ...
+ - distance functions
+ - KDE function
+ - metrics
 
 """
 
@@ -22,6 +23,9 @@ import math
 from pathlib import Path
 import os
 from typing import List, Tuple, Optional
+import time
+
+MINUTE: int = 60
 
 """
 Image utils
@@ -72,5 +76,24 @@ def compute_distance(p1, p2, metric):
     return metric(p1,p2)
 
 """
-other utils ...
+KDE (guassian)
 """
+def gaussian_KDE(): 
+    pass
+
+"""
+metrics
+"""
+def compute_FPS(algorithm: callable, **alg_kwargs):
+    start = time.perf_counter()
+    end = start + MINUTE
+    i = 0
+    
+    while time.perf_counter() < end:
+        algorithm(**alg_kwargs)
+        i+=1
+
+    return  i / MINUTE
+
+def mIoU(img1, img2):
+    pass
