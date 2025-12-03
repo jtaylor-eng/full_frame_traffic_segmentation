@@ -5,25 +5,21 @@ Functionality to:
  - get sample images from a directory
  - distance functions
  - KDE function
- - metrics
+ - metrics (FPS, ARI, mIoU??)
 
 """
 
-#imports I needed in my homeworks
-from skimage import filters
-from skimage import io, color, transform
+from skimage import io, transform
+from sklearn.metrics import adjusted_rand_score
 import numpy as np
 import torch
-from scipy.ndimage import convolve, maximum_filter
-from scipy.linalg import eigh
 import matplotlib.pyplot as plt
 import warnings
-warnings.filterwarnings('ignore') #avoid annoying imshow deprecated
-import math
 from pathlib import Path
 import os
 from typing import List, Tuple, Optional
 import time
+warnings.filterwarnings('ignore') #avoid annoying imshow deprecated
 
 MINUTE: int = 60
 
@@ -78,11 +74,20 @@ def compute_distance(p1, p2, metric):
 """
 KDE (guassian)
 """
-def gaussian_KDE(): 
-    pass
+def gaussian_KDE(distance, bandwith): 
+    return np.exp(-0.5 * (distance / bandwith)**2)
+
+KDE_FNS = {'gaussian': gaussian_KDE}
+
+def compute_KDE(distance, bandwith, metric):
+    if isinstance(metric, str):
+        if metric not in KDE_FNS: raise ValueError('invalid kernel')
+        metric = KDE_FNS[metric]
+
+    return metric(distance,bandwith) 
 
 """
-metrics
+Metrics
 """
 def compute_FPS(algorithm: callable, **alg_kwargs):
     start = time.perf_counter()
@@ -95,5 +100,22 @@ def compute_FPS(algorithm: callable, **alg_kwargs):
 
     return  i / MINUTE
 
-def mIoU(img1, img2):
+#NOTE: actually better to use Adjusted Rand Index for label agnosticism
+def ARI(mask1, mask2):
+    return adjusted_rand_score(mask1.flatten(), mask2.flatten())
+
+#see ARI, better metric
+def _IoU(mask1, mask2):
+    pass
+
+def mIoU(mask1, mask2):
+    """Compute mIoU using masks
+
+    NOTE: this will have to work for 'unlabelled' masks by computing 
+    IoU with every 2 labels, and matching best IoU.
+
+    This is because it is hard to specify that label 1 in image 1 will be 
+    corresponding to label 1 in image 2 given the nature of our clustering 
+    algorithms.  
+    """
     pass
